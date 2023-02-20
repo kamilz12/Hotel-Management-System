@@ -2,17 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct informationAboutRooms
+typedef struct roomsInHotel
 {
     char code[3];    //Code of room: available names p1,p2,p3
     float price;    
     int status;     //room is available(1) or unavailable (0) 
 }Hotel;
 
-void centerWord ( char specialWord []);
+void centerWord (char specialWord []);
 float * costPerPerson (Hotel room [], int hotelSize, float pricePerPerson[]);
 void freeRooms (Hotel room[], int hotelSize);
-float hotelGain (Hotel room[],int hotelSize,float hotelProfits);
+float hotelGain (Hotel room[],int hotelSize, float hotelProfits);
 
 int main()
 {   
@@ -32,7 +32,7 @@ int main()
         /*Enter room size*/
         do
         {
-            printf ("Enter %d room size, maximum room size is 3: ",i+1);
+            printf ("Enter %d room size, maximum room size is 3: ", i+1);
             scanf ("%d", &roomSize);
             switch (roomSize)
             {
@@ -69,7 +69,7 @@ int main()
     centerWord ("Cost per person");
     for (int i = 0; i < hotelSize; i++)
     {
-         printf ("Cost per one person in room number %d: %f\n",i+1, averagePerPerson[i]);
+         printf ("Cost per one person in room number %d: %f\n", i+1, averagePerPerson[i]);
     }
 
     /*Show free rooms*/
@@ -84,7 +84,7 @@ int main()
     centerWord ("All rooms");
     for (int i = 0; i < hotelSize; i++) 
     {
-        printf("Room %d,\t Code: %s,\t Price: %f, \tStatus: %d\n",i+1,hotelRoom[i].code, hotelRoom[i].price, hotelRoom[i].status);
+        printf ("Room %d,\t Code: %s,\t Price: %f, \tStatus: %d\n",i+1,hotelRoom[i].code, hotelRoom[i].price, hotelRoom[i].status);
     }
 
     free (averagePerPerson);
@@ -93,31 +93,33 @@ int main()
 
 }
 
+/*headline function*/
 void centerWord (char specialWord [])
 {
     int wordWidth = 50;
-    int len = strlen(specialWord);
+    int len = strlen (specialWord);
     int pad = (wordWidth - len) / 2;
-    printf("\n%*s%s%*s\n", pad, " ", specialWord, pad, " ");
+    printf ("\n%*s%s%*s\n", pad, " ", specialWord, pad, " ");
 }
 
+/*Calculating a room price for one person*/
 float * costPerPerson (Hotel room [], int hotelSize, float pricePerPerson[])
 {
     for (int i = 0; i < hotelSize; i++)
     {
         if(strcmp(room[i].code, "p1") == 0)
         {
-            pricePerPerson[i] = room[i].price;                    // jezeli ktory pokoj ma kod p1, p2 lub p3 to liczymy srednia 
+            pricePerPerson[i] = room[i].price;
         }                                                           
         
         else if(strcmp(room[i].code, "p2") == 0)
         {
-           pricePerPerson[i] = room[i].price/2;
+           pricePerPerson[i] = room[i].price / 2;
         }
         
         else if(strcmp(room[i].code, "p3") == 0)
         {
-            pricePerPerson[i] = room[i].price/3;
+            pricePerPerson[i] = room[i].price / 3;
         }
     }
     return pricePerPerson;
@@ -125,17 +127,18 @@ float * costPerPerson (Hotel room [], int hotelSize, float pricePerPerson[])
 
 void freeRooms (Hotel room[], int hotelSize)
 {
+    int available = 1;
     centerWord ("Free Rooms");
     for (int i = 0; i < hotelSize; i++)
     {
-       if (room[i].status == 1)
+       if (room[i].status == available)
        {
             printf("Room %d,\tkod: %s,\tcena: %f,\tstatus: %d\n",i+1, room[i].code, room[i].price, room[i].status);
        }
     }
 }
 
-float hotelGain (Hotel room[],int hotelSize,float hotelProfits)
+float hotelGain (Hotel room[], int hotelSize, float hotelProfits)
 {   
     int unavailable = 0;
     for (int i = 0; i < hotelSize; i++)
