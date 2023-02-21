@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 typedef struct roomsInHotel
 {
@@ -96,9 +97,7 @@ int main()
 /*headline function*/
 void centerWord (char specialWord [])
 {
-    int wordWidth = 50;
-    int len = strlen (specialWord);
-    int pad = (wordWidth - len) / 2;
+    int pad = (45 - strlen (specialWord))/2;
     printf ("\n%*s%s%*s\n", pad, " ", specialWord, pad, " ");
 }
 
@@ -125,19 +124,27 @@ float * costPerPerson (Hotel room [], int hotelSize, float pricePerPerson[])
     return pricePerPerson;
 }
 
+/*Printing all free rooms*/
 void freeRooms (Hotel room[], int hotelSize)
 {
+    bool noFree = true;
     int available = 1;
     centerWord ("Free Rooms");
     for (int i = 0; i < hotelSize; i++)
     {
        if (room[i].status == available)
        {
-            printf("Room %d,\tkod: %s,\tcena: %f,\tstatus: %d\n",i+1, room[i].code, room[i].price, room[i].status);
+            printf ("Room %d,\tkod: %s,\tcena: %f,\tstatus: %d\n", i+1, room[i].code, room[i].price, room[i].status);
+            noFree = false;
        }
+    }
+    if (noFree == true)
+    {
+        printf ("All rooms are occupied, no income\n");
     }
 }
 
+/*Total money income*/
 float hotelGain (Hotel room[], int hotelSize, float hotelProfits)
 {   
     int unavailable = 0;
@@ -145,7 +152,7 @@ float hotelGain (Hotel room[], int hotelSize, float hotelProfits)
     {
         if (room[i].status == unavailable)
         {
-                hotelProfits =+ room[i].price;      
+                hotelProfits += room[i].price;      
         }
     }
     return hotelProfits;
