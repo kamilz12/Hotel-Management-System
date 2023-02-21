@@ -7,16 +7,17 @@ typedef struct roomsInHotel
 {
     char code[3];    //Code of room: available names p1,p2,p3
     float price;    
-    int status;     //room is available(1) or unavailable (0) 
+    int status;     //room is available(1) or unavailable (0)
 }Hotel;
 
+void readFile ();
 int typeMenuOption ();
 Hotel enterRoom (Hotel hotelRoom [], int hotelSize);
 void mainMenu (Hotel hotelRoom[], int hotelSize);
 void centerWord (char specialWord []);
 float * costPerPerson (Hotel room [], int hotelSize, float pricePerPerson[]);
-void freeRooms (Hotel room[], int hotelSize);
-float hotelGain (Hotel room[],int hotelSize, float hotelProfits);
+void freeHotelRooms (Hotel room[], int hotelSize);
+float totalHotelGain (Hotel room[],int hotelSize);
 
 
 int main()
@@ -33,9 +34,12 @@ int main()
     hotelRoom [hotelSize] = enterRoom (hotelRoom, hotelSize);
 
     mainMenu (hotelRoom, hotelSize);
-    
 
     return 0;
+
+}
+void readFile ()
+{
 
 }
 
@@ -84,7 +88,7 @@ Hotel enterRoom(Hotel hotelRoom [], int hotelSize)
 int typeMenuOption ()
 {
     int menuID;
-    printf ("\n1. Cost per person\n2. Show free rooms\n3. Show all hotel profits\n4. Show all rooms in hotel\nEnter number of function withone you want to choose: ");
+    printf ("\n1. Cost per person\n2. Show free rooms\n3. Show all hotel profits\n4. Show all rooms in hotel\n5. Exit\nEnter number of function withone you want to choose: ");
     scanf ("%d", &menuID);
     return menuID;
 }
@@ -94,6 +98,7 @@ void mainMenu (Hotel hotelRoom[], int hotelSize)
     int menuOption;
     float * averagePerPerson, allProfits;
     averagePerPerson = (float*) calloc (hotelSize, sizeof(float));
+
     do
     {
         menuOption = typeMenuOption();
@@ -111,12 +116,12 @@ void mainMenu (Hotel hotelRoom[], int hotelSize)
 
         /*Show free rooms*/
         case 2:
-            freeRooms (hotelRoom, hotelSize);
+            freeHotelRooms (hotelRoom, hotelSize);
             break;
         
         /*Profit from occupied rooms*/
         case 3:
-            allProfits = hotelGain (hotelRoom, hotelSize, allProfits);
+            allProfits = totalHotelGain (hotelRoom, hotelSize);
             centerWord ("Total income from occupied rooms");
             printf ("Total income from occupied rooms: %f\n", allProfits);
             break;
@@ -176,9 +181,9 @@ float * costPerPerson (Hotel room [], int hotelSize, float pricePerPerson[])
 }
 
 /*Printing all free rooms*/
-void freeRooms (Hotel room[], int hotelSize)
+void freeHotelRooms (Hotel room[], int hotelSize)
 {
-    bool noFree = true;
+    bool noFreeRoom = true;
     int available = 1;
     centerWord ("Free Rooms");
     for (int i = 0; i < hotelSize; i++)
@@ -186,18 +191,19 @@ void freeRooms (Hotel room[], int hotelSize)
        if (room[i].status == available)
        {
             printf ("Room %d,\tkod: %s,\tcena: %f,\tstatus: %d\n", i+1, room[i].code, room[i].price, room[i].status);
-            noFree = false;
+            noFreeRoom = false;
        }
     }
-    if (noFree == true)
+    if (noFreeRoom == true)
     {
         printf ("All rooms are occupied, no income\n");
     }
 }
 
 /*Total money income*/
-float hotelGain (Hotel room[], int hotelSize, float hotelProfits)
+float totalHotelGain (Hotel room[], int hotelSize)
 {   
+    float hotelProfits = 0;
     int unavailable = 0;
     for (int i = 0; i < hotelSize; i++)
     {
