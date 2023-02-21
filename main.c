@@ -10,24 +10,38 @@ typedef struct roomsInHotel
     int status;     //room is available(1) or unavailable (0) 
 }Hotel;
 
+int typeMenuOption ();
+Hotel enterRoom (Hotel hotelRoom [], int hotelSize);
+void mainMenu (Hotel hotelRoom[], int hotelSize);
 void centerWord (char specialWord []);
 float * costPerPerson (Hotel room [], int hotelSize, float pricePerPerson[]);
 void freeRooms (Hotel room[], int hotelSize);
 float hotelGain (Hotel room[],int hotelSize, float hotelProfits);
 
+
 int main()
 {   
-    float * averagePerPerson, allProfits;
-    int hotelSize, roomSize, available = 1, unavailable = 0;
+    int hotelSize;
 
     /*Number of rooms in hotel structure*/
     printf ("How many rooms in your hotel do you have? ");
     scanf ("%d", &hotelSize); 
-    
+
     Hotel hotelRoom [hotelSize];
 
-    averagePerPerson = (float*) calloc (hotelSize, sizeof(float)); 
+    /*Input information about rooms*/
+    hotelRoom [hotelSize] = enterRoom (hotelRoom, hotelSize);
+
+    mainMenu (hotelRoom, hotelSize);
     
+
+    return 0;
+
+}
+
+Hotel enterRoom(Hotel hotelRoom [], int hotelSize)
+{
+    int available = 1, unavailable = 0, roomSize;
     for (int i = 0; i < hotelSize; i++) 
     {  
         /*Enter room size*/
@@ -64,34 +78,71 @@ int main()
         } while ((hotelRoom[i].status != available) && (hotelRoom[i].status != unavailable));
         printf ("\n");
     }
+    return hotelRoom[hotelSize];
+}
 
-    /*Cost per 1 person*/
-    averagePerPerson = costPerPerson (hotelRoom, hotelSize, averagePerPerson);
-    centerWord ("Cost per person");
-    for (int i = 0; i < hotelSize; i++)
+int typeMenuOption ()
+{
+    int menuID;
+    printf ("\n1. Cost per person\n2. Show free rooms\n3. Show all hotel profits\n4. Show all rooms in hotel\nEnter number of function withone you want to choose: ");
+    scanf ("%d", &menuID);
+    return menuID;
+}
+
+void mainMenu (Hotel hotelRoom[], int hotelSize)
+{
+    int menuOption;
+    float * averagePerPerson, allProfits;
+    averagePerPerson = (float*) calloc (hotelSize, sizeof(float));
+    do
     {
-         printf ("Cost per one person in room number %d: %f\n", i+1, averagePerPerson[i]);
+        menuOption = typeMenuOption();
+        switch (menuOption)
+        {
+        /*Cost per 1 person*/
+        case 1:
+            averagePerPerson = costPerPerson (hotelRoom, hotelSize, averagePerPerson);
+            centerWord ("Cost per person");
+            for (int i = 0; i < hotelSize; i++)
+            {
+                printf ("Cost per one person in room number %d: %f\n", i+1, averagePerPerson[i]);
+            }
+            break;
+
+        /*Show free rooms*/
+        case 2:
+            freeRooms (hotelRoom, hotelSize);
+            break;
+        
+        /*Profit from occupied rooms*/
+        case 3:
+            allProfits = hotelGain (hotelRoom, hotelSize, allProfits);
+            centerWord ("Total income from occupied rooms");
+            printf ("Total income from occupied rooms: %f\n", allProfits);
+            break;
+
+        /*List of all rooms*/
+        case 4:
+            centerWord ("All rooms");
+            for (int i = 0; i < hotelSize; i++) 
+            {
+                printf ("Room %d,\t Code: %s,\t Price: %f, \tStatus: %d\n",i+1,hotelRoom[i].code, hotelRoom[i].price, hotelRoom[i].status);
+            }
+            break;
+
+        case 5:
+            printf ("Exit");
+            exit(0);
+            break;
+
+        default: 
+            printf ("Wrong choice");
+            break;
+
     }
-
-    /*Show free rooms*/
-    freeRooms (hotelRoom, hotelSize);
-    
-    /*Profit from occupied rooms*/
-    allProfits = hotelGain (hotelRoom, hotelSize, allProfits);
-    centerWord ("Total income from occupied rooms");
-    printf ("Total income from occupied rooms: %f\n", allProfits);
-
-    /*List of all rooms*/
-    centerWord ("All rooms");
-    for (int i = 0; i < hotelSize; i++) 
-    {
-        printf ("Room %d,\t Code: %s,\t Price: %f, \tStatus: %d\n",i+1,hotelRoom[i].code, hotelRoom[i].price, hotelRoom[i].status);
     }
-
+    while (menuOption != 5);
     free (averagePerPerson);
-
-    return 0;
-
 }
 
 /*headline function*/
