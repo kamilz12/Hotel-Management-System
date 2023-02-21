@@ -10,9 +10,9 @@ typedef struct roomsInHotel
     int status;     //room is available(1) or unavailable (0)
 }Hotel;
 
-void readFile ();
+void saveRoomData (Hotel hotelRoom[], int hotelSize);
 int typeMenuOption ();
-Hotel enterRoom (Hotel hotelRoom [], int hotelSize);
+Hotel enterRoom (Hotel hotelRoom [],int hotelSize);
 void mainMenu (Hotel hotelRoom[], int hotelSize);
 void centerWord (char specialWord []);
 float * costPerPerson (Hotel room [], int hotelSize, float pricePerPerson[]);
@@ -23,24 +23,31 @@ float totalHotelGain (Hotel room[],int hotelSize);
 int main()
 {   
     int hotelSize;
-
     /*Number of rooms in hotel structure*/
     printf ("How many rooms in your hotel do you have? ");
-    scanf ("%d", &hotelSize); 
-
+    scanf ("%d", &hotelSize);
+    
     Hotel hotelRoom [hotelSize];
-
     /*Input information about rooms*/
     hotelRoom [hotelSize] = enterRoom (hotelRoom, hotelSize);
-
+    saveRoomData (hotelRoom, hotelSize);
     mainMenu (hotelRoom, hotelSize);
 
     return 0;
 
 }
-void readFile ()
-{
 
+void saveRoomData (Hotel hotelRoom[], int hotelSize)
+{
+    FILE *roomData = fopen("roomdata.txt", "a");
+    if (roomData == NULL) {
+        printf("Failed to open file\n");
+        exit(0);
+    }
+    for (int i = 0; i < hotelSize; i++) {
+        fprintf(roomData, "%s %f %d\n", hotelRoom[i].code,hotelRoom[i].price,hotelRoom[i].status);
+    }
+    fclose (roomData);
 }
 
 Hotel enterRoom(Hotel hotelRoom [], int hotelSize)
