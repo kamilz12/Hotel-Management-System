@@ -12,6 +12,9 @@ typedef struct roomsInHotel
 
 int readRoomData ();
 void saveRoomData (Hotel hotelRoom[], int hotelSize);
+void enterCodeOfTheRoom (Hotel hotelRoom[], int workedRoom);
+void enterRoomPrice (Hotel hotelRoom[], int workedRoom);
+void enterRoomStatus (Hotel hotelRoom[], int workedRoom);
 int typeMenuOption ();
 int enterRoom (Hotel hotelRoom [],int hotelSize);
 void mainMenu (Hotel hotelRoom[], int hotelSize);
@@ -19,6 +22,7 @@ void centerWord (char specialWord []);
 float * costPerPerson (Hotel room [], int hotelSize, float pricePerPerson[]);
 void freeHotelRooms (Hotel room[], int hotelSize);
 float totalHotelGain (Hotel room[],int hotelSize);
+void changeRoomData (Hotel room[], int hotelSize);
 
 /*przyszle zmiany:
 1. Odczyt bazy pokoi w struktury z pliku - done
@@ -26,22 +30,23 @@ float totalHotelGain (Hotel room[],int hotelSize);
 3. funkcja dodaj nowy pokoj - done
 4. funkcja usun pokoj (?)
 5. Wlasciciel pokoju zajetego (?)
-6. Zmiana statusu pokoju
+6. Zmiana statusu pokoju: -done 
+    a) kod
+    b) koszt
+    c) status
+    d) usuń pokoj
+    e) 
 */
 
 
 
 int main()
 {   
-
-    int hotelSize = 1000;
+    int hotelSize = 1000; //maximum number of rooms in hotel
 
     Hotel hotelRoom [hotelSize];
     hotelSize = readRoomData(hotelRoom, hotelSize);
     mainMenu (hotelRoom, hotelSize);
-    /*Input information about rooms*/
-    
-
     return 0;
 
 }
@@ -65,12 +70,13 @@ int readRoomData (Hotel hotelRoom[], int hotelSize)
 void saveRoomData (Hotel hotelRoom[], int hotelSize)
 {
     FILE * roomDataFile = fopen ("roomdata.dat", "w");
-    if (roomDataFile == NULL) {
+    if (!roomDataFile) {
         printf ("Failed to open file\n");
-        exit (0);
+        exit (EXIT_SUCCESS);
     }
 
-    else {
+    else 
+    {
     for (int i = 0; i < hotelSize; i++) {
         fprintf (roomDataFile, "%s,%.2f,%d\n", hotelRoom[i].code, hotelRoom[i].price, hotelRoom[i].status);
        }
@@ -78,56 +84,74 @@ void saveRoomData (Hotel hotelRoom[], int hotelSize)
     fclose (roomDataFile);
 }
 
-int enterRoom(Hotel hotelRoom [], int hotelSize)
+void enterCodeOfTheRoom (Hotel hotelRoom[], int workedRoom)
 {
-    int available = 1, unavailable = 0, roomSize,newRoomsNumber;
-    printf ("How many rooms do you want to add to your hotel? ");
-    scanf ("%d", &newRoomsNumber);
-    for (int i = hotelSize; i < hotelSize + newRoomsNumber; i++) 
-    {  
-        /*Enter room size*/
-        do
+    int roomSize;
+    do
         {
-            printf ("Enter %d room size, maximum room size is 3: ", i+1);
+            printf ("Enter %d room size, maximum room size is 3: ", workedRoom+1);
             scanf ("%d", &roomSize);
             switch (roomSize)
             {
                 case 1:
-                    strcpy (hotelRoom[i].code, "p1");
+                    strcpy (hotelRoom[workedRoom].code, "p1");
                     break;
                 case 2:
-                    strcpy (hotelRoom[i].code, "p2");
+                    strcpy (hotelRoom[workedRoom].code, "p2");
                     break;
                 case 3:
-                    strcpy (hotelRoom[i].code, "p3");
+                    strcpy (hotelRoom[workedRoom].code, "p3");
+                    break;
+                case 4:
+                    strcpy (hotelRoom[workedRoom].code, "p4");
                     break;
             }
 
-        }while ((strcmp(hotelRoom[i].code, "p1") != 0) && (strcmp(hotelRoom[i].code, "p2") != 0) && (strcmp(hotelRoom[i].code, "p3") != 0));
+        }while ((strcmp(hotelRoom[workedRoom].code, "p1") != 0) && (strcmp(hotelRoom[workedRoom].code, "p2") != 0) && (strcmp(hotelRoom[workedRoom].code, "p3") != 0) &&  (strcmp(hotelRoom[workedRoom].code, "p4") != 0));
+}
 
-        /*Enter price of the room*/    
-        printf ("Enter the price of your room %d :", i+1);
-        scanf ("%f", &hotelRoom[i].price);
+void enterRoomPrice (Hotel hotelRoom[], int workedRoom)
+{
+    printf ("Enter price of room: ");
+    scanf ("%f", &hotelRoom[workedRoom].price);
+}
 
+void setRoomStatus (Hotel hotelRoom[], int workedRoom)
+{
+    int available = 1, unavailable = 0;
+    do
+    {
+        printf ("Room number %d is:\n0. Unavailable\n1. Available\nEnter number: ", workedRoom+1 );
+        scanf ("%d", &hotelRoom[workedRoom].status);
 
-        /*Status of the room */   
-        do
-        {
-            printf ("Room number %d is:\n0. Unavailable\n1. Available\nEnter number: ", i+1 );
-            scanf ("%d", &hotelRoom[i].status);
-
-        } while ((hotelRoom[i].status != available) && (hotelRoom[i].status != unavailable));
-        printf ("\n");
-    }
-    return hotelSize + newRoomsNumber;
+    } while ((hotelRoom[workedRoom].status != available) && (hotelRoom[workedRoom].status != unavailable));
 }
 
 int typeMenuOption ()
 {
     int menuID;
-    printf ("\n1. Cost per person\n2. Show free rooms\n3. Show all hotel profits\n4. Show all rooms in hotel\n5. Enter new room to your hotel\n6. Save your data rooms to file\nEnter number of function withone you want to choose: ");
+    printf 
+    ("\n1. Cost per person\n2. Show free rooms\n3. Show all hotel profits\n4. Show all rooms in hotel\n5. Enter new room to your hotel\n6. Change data\n7. Save changes and exit\n8. Exit\nEnter number of function withone you want to choose: ");
     scanf ("%d", &menuID);
     return menuID;
+}
+
+int enterRoom(Hotel hotelRoom [], int hotelSize)
+{
+    int newRoomsNumber;
+    printf ("How many rooms do you want to add to your hotel? ");
+    scanf ("%d", &newRoomsNumber);
+    for (int i = hotelSize; i < hotelSize + newRoomsNumber; i++) 
+    {  
+        /*Enter code of the room size*/
+        enterCodeOfTheRoom (hotelRoom, i);
+        /*Enter price of the room*/    
+        enterRoomPrice (hotelRoom, i);
+        /*Status of the room */   
+        setRoomStatus (hotelRoom, i);
+        printf ("\n");
+    }
+    return hotelSize + newRoomsNumber;
 }
 
 void mainMenu (Hotel hotelRoom[], int hotelSize)
@@ -177,11 +201,17 @@ void mainMenu (Hotel hotelRoom[], int hotelSize)
             break;
 
         case 6:
-            saveRoomData (hotelRoom, hotelSize);
+            changeRoomData (hotelRoom, hotelSize);
             break;
 
         case 7:
-            printf ("Exit");
+            printf ("Saved changes, bye bye :)");
+            saveRoomData (hotelRoom, hotelSize);
+            exit (0);
+            break;
+
+        case 8:
+            printf ("Bye bye :)");
             exit(0);
             break;
 
@@ -191,7 +221,7 @@ void mainMenu (Hotel hotelRoom[], int hotelSize)
 
     }
     }
-    while (menuOption != 7);
+    while (menuOption != 8 && menuOption !=7);
     free (averagePerPerson);
 }
 
@@ -258,4 +288,18 @@ float totalHotelGain (Hotel room[], int hotelSize)
         }
     }
     return hotelProfits;
+}
+
+void changeRoomData (Hotel hotelRoom[], int hotelSize)
+{
+    int roomBeingChanged;
+    printf ("Choose room which one you want to change: ");
+    scanf ("%d", &roomBeingChanged);
+    
+    /*Enter code of the room*/
+    enterCodeOfTheRoom (hotelRoom, roomBeingChanged-1);
+    /*Enter price of the room*/    
+    enterRoomPrice (hotelRoom, roomBeingChanged-1);
+    /*Status of the room */   
+    setRoomStatus (hotelRoom, roomBeingChanged-1);
 }
