@@ -10,50 +10,80 @@ typedef struct roomsInHotel
     int status;     //room is available(1) or unavailable (0)
 }Hotel;
 
+int readRoomData ();
 void saveRoomData (Hotel hotelRoom[], int hotelSize);
 int typeMenuOption ();
-Hotel enterRoom (Hotel hotelRoom [],int hotelSize);
+int enterRoom (Hotel hotelRoom [],int hotelSize);
 void mainMenu (Hotel hotelRoom[], int hotelSize);
 void centerWord (char specialWord []);
 float * costPerPerson (Hotel room [], int hotelSize, float pricePerPerson[]);
 void freeHotelRooms (Hotel room[], int hotelSize);
 float totalHotelGain (Hotel room[],int hotelSize);
 
+/*przyszle zmiany:
+1. Odczyt bazy pokoi w struktury z pliku - done
+2. zapis bazy pokoi do struktury roomsInHotel - done
+3. funkcja dodaj nowy pokoj - done
+4. funkcja usun pokoj (?)
+5. Wlasciciel pokoju zajetego (?)
+6. Zmiana statusu pokoju
+*/
+
+
 
 int main()
 {   
-    int hotelSize;
-    /*Number of rooms in hotel structure*/
-    printf ("How many rooms in your hotel do you have? ");
-    scanf ("%d", &hotelSize);
-    
+
+    int hotelSize = 1000;
+
     Hotel hotelRoom [hotelSize];
-    /*Input information about rooms*/
-    hotelRoom [hotelSize] = enterRoom (hotelRoom, hotelSize);
-    saveRoomData (hotelRoom, hotelSize);
+    hotelSize = readRoomData(hotelRoom, hotelSize);
     mainMenu (hotelRoom, hotelSize);
+    /*Input information about rooms*/
+    
 
     return 0;
 
 }
 
-void saveRoomData (Hotel hotelRoom[], int hotelSize)
+int readRoomData (Hotel hotelRoom[], int hotelSize)
 {
-    FILE *roomData = fopen("roomdata.txt", "a");
-    if (roomData == NULL) {
-        printf("Failed to open file\n");
-        exit(0);
+    int numberRoomsInFile = 0;
+    FILE * roomReadFile;
+    roomReadFile = fopen("roomdata.dat", "rb");
+
+    if (!roomReadFile) {
+        printf("Failed to open file.\n");
     }
-    for (int i = 0; i < hotelSize; i++) {
-        fprintf(roomData, "%s %f %d\n", hotelRoom[i].code,hotelRoom[i].price,hotelRoom[i].status);
+       
+    while (fscanf(roomReadFile, "%2s,%f,%d\n", hotelRoom[numberRoomsInFile].code, &hotelRoom[numberRoomsInFile].price, &hotelRoom[numberRoomsInFile].status) == 3) {
+        numberRoomsInFile++;
     }
-    fclose (roomData);
+    return numberRoomsInFile;
 }
 
-Hotel enterRoom(Hotel hotelRoom [], int hotelSize)
+void saveRoomData (Hotel hotelRoom[], int hotelSize)
 {
-    int available = 1, unavailable = 0, roomSize;
-    for (int i = 0; i < hotelSize; i++) 
+    FILE * roomDataFile = fopen ("roomdata.dat", "w");
+    if (roomDataFile == NULL) {
+        printf ("Failed to open file\n");
+        exit (0);
+    }
+
+    else {
+    for (int i = 0; i < hotelSize; i++) {
+        fprintf (roomDataFile, "%s,%.2f,%d\n", hotelRoom[i].code, hotelRoom[i].price, hotelRoom[i].status);
+       }
+    }
+    fclose (roomDataFile);
+}
+
+int enterRoom(Hotel hotelRoom [], int hotelSize)
+{
+    int available = 1, unavailable = 0, roomSize,newRoomsNumber;
+    printf ("How many rooms do you want to add to your hotel? ");
+    scanf ("%d", &newRoomsNumber);
+    for (int i = hotelSize; i < hotelSize + newRoomsNumber; i++) 
     {  
         /*Enter room size*/
         do
@@ -75,7 +105,7 @@ Hotel enterRoom(Hotel hotelRoom [], int hotelSize)
 
         }while ((strcmp(hotelRoom[i].code, "p1") != 0) && (strcmp(hotelRoom[i].code, "p2") != 0) && (strcmp(hotelRoom[i].code, "p3") != 0));
 
-        /*Enter price room*/    
+        /*Enter price of the room*/    
         printf ("Enter the price of your room %d :", i+1);
         scanf ("%f", &hotelRoom[i].price);
 
@@ -89,13 +119,13 @@ Hotel enterRoom(Hotel hotelRoom [], int hotelSize)
         } while ((hotelRoom[i].status != available) && (hotelRoom[i].status != unavailable));
         printf ("\n");
     }
-    return hotelRoom[hotelSize];
+    return hotelSize + newRoomsNumber;
 }
 
 int typeMenuOption ()
 {
     int menuID;
-    printf ("\n1. Cost per person\n2. Show free rooms\n3. Show all hotel profits\n4. Show all rooms in hotel\n5. Exit\nEnter number of function withone you want to choose: ");
+    printf ("\n1. Cost per person\n2. Show free rooms\n3. Show all hotel profits\n4. Show all rooms in hotel\n5. Enter new room to your hotel\n6. Save your data rooms to file\nEnter number of function withone you want to choose: ");
     scanf ("%d", &menuID);
     return menuID;
 }
@@ -142,7 +172,15 @@ void mainMenu (Hotel hotelRoom[], int hotelSize)
             }
             break;
 
-        case 5:
+        case 5: 
+            hotelSize = enterRoom (hotelRoom, hotelSize);
+            break;
+
+        case 6:
+            saveRoomData (hotelRoom, hotelSize);
+            break;
+
+        case 7:
             printf ("Exit");
             exit(0);
             break;
@@ -153,7 +191,7 @@ void mainMenu (Hotel hotelRoom[], int hotelSize)
 
     }
     }
-    while (menuOption != 5);
+    while (menuOption != 7);
     free (averagePerPerson);
 }
 
