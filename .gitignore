@@ -1,1 +1,6 @@
-roomdata.txt
+# Ignore specific files
+CMakeLists.txt
+main.exe
+
+# Ignore all files in a specific directory
+.vscode
